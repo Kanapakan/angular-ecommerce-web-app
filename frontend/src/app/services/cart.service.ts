@@ -22,12 +22,7 @@ export class CartService {
     if (this.cartItems.length > 0) {
       // find the item in the cart based on item id
 
-      for (let tempCartItem of this.cartItems) {
-        if (tempCartItem.id === theCartItem.id) {
-          existingCartItem = tempCartItem;
-          break;
-        }
-      }
+      existingCartItem = this.cartItems.find(cartItem => cartItem.id === theCartItem.id);
 
       // check if found the item in cart
       alreadyExistsInCart = (existingCartItem != undefined);
@@ -51,6 +46,32 @@ export class CartService {
   }
   
   computeCartTotals() {
-    throw new Error('Method not implemented.');
+    let totalPriceValue: number = 0;
+    let totalQuantityValue: number = 0;
+
+    for (let currentCartItem of this.cartItems) {
+      totalPriceValue += currentCartItem.quantity * currentCartItem.unitPrice;
+      totalQuantityValue += currentCartItem.quantity;
+    }
+
+    //publish the new values .. all subscribles will receive the new data
+    this.totalPrice.next(totalPriceValue);
+    this.totalQuantity.next(totalQuantityValue);
+
+    // log cart data just for debugging purpose
+    this.logCartData(totalPriceValue, totalQuantityValue);
   }
+
+  logCartData(totalPriceValue: number, totalQuantityValue: number) {
+    console.log("Contents of the cart");
+    for (let tempCartItem of this.cartItems) {
+      const subTotalPrice = tempCartItem.quantity * tempCartItem.unitPrice;
+      console.log(`name: ${tempCartItem.name}, quantity=${tempCartItem.quantity}, unitPrice=${tempCartItem.unitPrice}, subTotalPrice=${subTotalPrice}`);     
+    }
+
+    console.log(`totalPrice: ${totalPriceValue.toFixed(2)}l totalQuantity: ${totalQuantityValue}`);
+    console.log("------");
+  }
+
+
 }
